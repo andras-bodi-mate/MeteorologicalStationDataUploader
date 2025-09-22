@@ -1,6 +1,7 @@
 import sty
 from inspect import stack
 import pathlib
+from datetime import datetime
 
 from strip_ansi import strip_ansi
 
@@ -13,7 +14,8 @@ class Logger:
         callerFile = callerStackFrame.filename
         callerFileName = f"[{pathlib.Path(callerFile).name}]"
         for lineIndex, line in enumerate(message.split('\n')):
-            logInfo = f"{callerFileName} {level}:"
+            now = datetime.now()
+            logInfo = f"{callerFileName} ({now.hour:02d}:{now.minute:02d}:{now.second:02d}) {level}:"
             padding = Logger.paddedWidth - len(strip_ansi(logInfo))
 
             if lineIndex == 0:
@@ -27,11 +29,11 @@ class Logger:
 
     @staticmethod
     def logDebug(*values):
-        Logger.log(sty.fg.grey + Logger.getMessageFromValues(values) + sty.rs.all, sty.fg.grey + "DEBUG" + sty.rs.all)
+        Logger.log(sty.fg.grey + Logger.getMessageFromValues(values) + sty.rs.all, sty.fg.li_cyan + "DEBUG" + sty.rs.all)
 
     @staticmethod
     def logInfo(*values):
-        Logger.log(sty.fg.li_cyan + Logger.getMessageFromValues(values) + sty.rs.all, sty.fg.li_cyan + "INFO" + sty.rs.all)
+        Logger.log(sty.fg.li_grey + Logger.getMessageFromValues(values) + sty.rs.all, sty.fg.green + "INFO" + sty.rs.all)
 
     @staticmethod
     def logWarning(*values):

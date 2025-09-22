@@ -17,9 +17,14 @@ class Server:
     def parseOptionalFloat(optionalFloat: OptionalFloat):
         return None if (optionalFloat == "" or optionalFloat == None) else float(optionalFloat)
 
+    def lifespan(self):
+        Logger.logInfo(f"Server successfully started.")
+        yield
+        Logger.logInfo(f"Server successfully shut down.")
+
     def __init__(self):
         Logger.logInfo("Server starting...")
-        self.app = FastAPI()
+        self.app = FastAPI(lifespan = Server.lifespan)
 
         self.app.add_middleware(
             CORSMiddleware,
@@ -61,6 +66,28 @@ class Server:
             yearlyRain = Server.parseOptionalFloat(yearlyRain)
             yearMonthDay, hourMinuteSecond = date.split(' ')
             date = datetime(*map(int, yearMonthDay.split('-')), *map(int, hourMinuteSecond.split(':')))
+
+            Logger.logInfo(
+                f"username: {username}\n"
+                f"password: {password}\n"
+                f"indoor temperature: {indoorTemperature}\n"
+                f"dew point: {dewPoint}\n"
+                f"outdoor temperature: {outdoorTemperature}\n"
+                f"windChill: {windChill}\n"
+                f"indoor humidity: {indoorHumidity}\n"
+                f"outdoor humidity: {outdoorHumidity}\n"
+                f"wind speed: {windSpeed}\n"
+                f"gust speed: {gustSpeed}\n"
+                f"wind direction: {windDirection}\n"
+                f"absolute air pressure: {absoluteAirPressure}\n"
+                f"relative air pressure: {relativeAirPressure}\n"
+                f"rain rate: {rainRate}\n"
+                f"daily rain: {dailyRain}\n"
+                f"weekly rain: {weeklyRain}\n"
+                f"monthly rain: {monthlyRain}\n"
+                f"yearly rain: {yearlyRain}\n"
+                f"date: {date}"
+            )
 
             report = Report(
                 date,
@@ -106,25 +133,6 @@ class Server:
 
             if response.status_code != requests.status_codes.codes.OK:
                 Logger.logError(f"Couldn't send report. Reason: \"{response.reason}\"  {response.status_code} {responses[response.status_code].upper()}")
-
-            Logger.logInfo(f"username: {username}\n"
-                           f"password: {password}\n"
-                           f"indoor temperature: {indoorTemperature}\n"
-                           f"dew point: {dewPoint}\n"
-                           f"outdoor temperature: {outdoorTemperature}\n"
-                           f"windChill: {windChill}\n"
-                           f"indoor humidity: {indoorHumidity}\n"
-                           f"outdoor humidity: {outdoorHumidity}\n"
-                           f"wind speed: {windSpeed}\n"
-                           f"gust speed: {gustSpeed}\n"
-                           f"wind direction: {windDirection}\n"
-                           f"absolute air pressure: {absoluteAirPressure}\n"
-                           f"relative air pressure: {relativeAirPressure}\n"
-                           f"rain rate: {rainRate}\n"
-                           f"daily rain: {dailyRain}\n"
-                           f"weekly rain: {weeklyRain}\n"
-                           f"monthly rain: {monthlyRain}\n"
-                           f"yearly rain: {yearlyRain}\n"
-                           f"date: {date}")
+            Logger.logInfo("Successfully sent report")
 
             return {"status": "ok"}
